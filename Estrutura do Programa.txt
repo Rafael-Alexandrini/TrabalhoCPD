@@ -1,0 +1,112 @@
+Algumas anotações de como podemos implementar o programa
+Escrito principalmente para tirar ideias da cabeça, nada fixo
+
+Como os arquivos são muito grandes, adicionei no .gitignore
+vamos convencionar de deixar todos arquivos no mesmo nível
+
+ratings.csv: userId,movieId,rating,date
+movies.csv: movieId,title,genres,year
+tags: userId,movieId,tag,timestamp
+
+Estrutura geral do código:
+    1. Leitura dos arquivos e criação de estruturas
+        Queremos que seja abaixo de 1 minuto, máximo de 3
+        Ideal que movies.csv seja lido primeiro
+    2. Loop para interface com usuário para pesquisas
+
+
+Estruturas 1-4:
+    Estrutura 1: Tabela Hash 
+        Chave: movieId
+        Dados satélite: title,genres,year e média das ratings
+        
+        Podemos armazenar como uma lista:
+        [movieId, titles, genres, year, soma das ratings, número de ratings]
+        Após processar, fazemos a divisão e fica:
+        [movieId, titles, genres, year, média das ratings, número de ratings]
+        
+        Podemos também armazenar cada item como uma tupla:
+        (movieId, [titles, genres, year, média das ratings, número de ratings])
+        Se é mais legível ou rápido, não sei. Para ser mais simples pode ser só uma lista
+        Podemos decidir depois
+
+        ! Temos que ver como vai ser esse processamento !
+        Provavelmente iremos ler movies.csv e fazer o cálculo de ratings conforme lemos ratings.csv
+        
+    Estrutura 2: Algum tipo de árvore de prefixos
+        Tipo de árvore será decidido, não muda muito contanto que funcione
+        Talvez uma TST ou Radix Tree seja mais rápida, mas não sei quanto que importa
+        Chave: string title 
+        Retorno: movieId
+
+        Pode ser construída enquanto lemos movies.csv
+
+    Estrutura 3: reviews de usuários
+        Chave: userId
+        Retorno: lista de movieId, rating       (não precisa guardar date)
+
+        Estou pensando em usar uma tabela hash também
+        Podemos já guardar a lista na ordem desejada pela pesquisa 2, 
+        mas isso pode deixar o build mais lento, então não é necessário
+
+    Estrutura 4: tags 
+    Chave: string tag
+    Retorno: lista de movieId
+
+    Como assume-se que a pesquisa é de tags escritas corretamente, 
+    acho que podemos usar mais uma tabela hash
+
+
+Pesquisas 1-4:
+    Pesquisa 1: prefixos de nomes de filmes
+        Entrada: string prefixo de título
+        Saída: lista de filmes (e dados satélites) com esse prefixo, ordenada por maior rating
+        movieId,title,genres,year,rating,count
+
+        Pesquisaremos na estrutura 2, retornando uma lista de movieIds 
+        de filmes que começam com esse prefixo
+        Após, cria-se uma lista com os dados satélites obtidos da estrutura 1
+        E ordena-se pela maior rating
+
+        A parte de fazer print de forma organizada pode ser feita pela biblioteca Pandas
+        Também não sei usar ainda, mas acho que tem uma função pra isso
+
+    Pesquisa 2: filmes revisados por usuários
+        Entrada: userId
+        Saída: lista movieId,title,genres,year,média_ratings,count,rating 
+            A lista deve estar ordenada primeiro por rating, e depois por média_ratings
+
+        Fazemos pesquisa na estrutura 3 com userId, e depois na 1 com movieId
+        
+        Vamos ter que pensar em como faremos essa ordenação dupla. 
+        Estou pensando em algo como o RadixSort Bottom-Up (acho que é esse ???)
+        Em que ordenaria primeiro por rating e depois ordena internamente para cada grupo de mesmo rating
+        Acho que cada rating é num formato certinho (0, 0.5, 1, 1.5, etc.) que dá pra aproveitar
+
+    Pesquisa 3: melhores filmes de uma determinado gênero 
+        Entrada: N, genre
+        Saída: lista de N melhores filmes do gênero, mas apenas filmes com count >= 1000
+            movieId,title,genres,year,rating,count
+
+        Esse N só vai ser considerado no display, 
+        vamos precisar de todos os filmes do gênero para ordenar
+
+        Como nenhuma das 4 estruturas permite pesquisar por gênero diretamente, 
+        acho que vamos ter que fazer uma nova para esse tipo de pesquisa
+        Podemos fazer isso enquanto lemos movies.csv (e tirar os count >= 1000 depois)
+        ou enquanto lemos ratings.csv, adicionando a essa estrutura quando passa de count >= 1000
+        A estrutura teria entrada genre e saída lista de movieId
+
+    Pesquisa 4: busca por tags
+        Entrada: duas tags*
+        Saída: lista de filmes com ambas tags
+            movieId,title,genres,year,rating,count
+            * temos que ver com o sor se são duas ou se podem ser mais**
+            ** acho que são só duas
+
+        Faremos duas buscas na estrutura 4, retornando duas listas
+        Faremos a intersecção entre elas
+        Buscaremos pelos dados satélite na estrutura 1
+        Ordenaremos, como nas pesquisas 1 e 3
+        
+
