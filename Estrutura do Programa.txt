@@ -49,12 +49,29 @@ Estruturas 1-4:
         Podemos já guardar a lista na ordem desejada pela pesquisa 2, 
         mas isso pode deixar o build mais lento, então não é necessário
 
-    Estrutura 4: tags 
-    Chave: string tag
-    Retorno: lista de movieId
+        Uma entrada da tabela hash teria o formato
+        [userId, [lista no formato (movieId, rating)]]
 
-    Como assume-se que a pesquisa é de tags escritas corretamente, 
-    acho que podemos usar mais uma tabela hash
+        Talvez precise de um modo de inserção próprio
+        Como o arquivo está ordenado, pode-se fazer a lista 
+        antes de inserir na tabela hash
+
+    Estrutura 4: tags 
+        Chave: string tag
+        Retorno: lista de movieId
+
+        Como assume-se que a pesquisa é de tags escritas corretamente, 
+        acho que podemos usar mais uma tabela hash
+
+        Estou tentando reaproveitar a mesma estrutura de tabela hash pra tudo,
+        então talvez eu coloque um parâmetro na função de hash para lidar com int ou string
+        Talvez precise de uma função de inserção diferente
+
+        Uma entrada da tabela hash seria:
+        [tag, [lista de movieIds]]
+        Como deve-se inserir dentro dessa lista de movieIds, 
+        talvez precise de uma estrutura separada
+        Vou usar uma estrutura diferente para 3, 4 e aquela da pesquisa 3
 
 
 Pesquisas 1-4:
@@ -93,6 +110,7 @@ Pesquisas 1-4:
 
         Como nenhuma das 4 estruturas permite pesquisar por gênero diretamente, 
         acho que vamos ter que fazer uma nova para esse tipo de pesquisa
+        Seria parecida com a estrutura 4, das tags
         Podemos fazer isso enquanto lemos movies.csv (e tirar os count >= 1000 depois)
         ou enquanto lemos ratings.csv, adicionando a essa estrutura quando passa de count >= 1000
         A estrutura teria entrada genre e saída lista de movieId
