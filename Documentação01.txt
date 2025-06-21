@@ -1,0 +1,132 @@
+Estrutura 1: HashTable - Tabela Hash Genérica
+    Cada entrada é uma lista de sete valores:
+    [int movieId, string title, string genres, int year, float media_ratings, int n_ratings]
+    int movieId será usado como chave da entrada
+    float media_ratings e int n_ratings serão inicializados em 0, e atualizados conforme é lido ratings.csv
+
+    HashTable(size)
+        Função de criação da tabela
+        int size: número de buckets da tabela
+        Retorna uma instância da classe
+
+    _hashFunc(key)
+        Função de hash de uso interno da tabela
+        int key: chave da entrada
+        Retorna índice da tabela 
+
+    insert(entry)
+        Função de inserção de entrada na tabela
+        list entry: é uma lista, em que o primeiro valor DEVE ser a chave 
+        a lista será a seguinte, por padrão:
+        [int movieId, string title, string genres, int year, float media_ratings, int n_ratings]
+    
+    search(key)
+        Função de procura na tabela
+        int key: é a chave a ser procurada
+        Se entrada está na tabela: retorna a lista que compõe a entrada
+        Se entrada não está na tabela: retorna o booleano False 
+    
+Estrutura 2: Alguma Árvore de Prefixos. A ser feita
+    Funções necessárias:
+        Construtor da árvore
+        Inserção de entrada 
+            Entrada: string title e int key
+            int key deve ser o movieId, para busca na primeira estrutura
+        Busca por prefixo
+            Entrada: string prefixo
+            Retorna lista de movieIds que tem esse prefixo
+            
+            Para essa função será necessário poder navegar até certo nodo
+            e fazer um encaminhamento que retorne toda a sub-árvore
+            a partir dele
+
+Estrutura 3 e 4: ListHashTable - Tabela Hash com múltiplas entradas por chave
+    A mesma classe é usada para ambas estruturas, com uma modificação:
+    na construção há escolha do tipo de chave que será usada: int ou string
+    Cada entrada da tabela é uma tupla de uma chave e de um conjunto
+    (int|string chave, {conjunto_de_valores})
+    set conjunto_de_valores é o conjunto de valores relacionado à chave
+    Foi escolhido usar um conjunto em vez de uma lista para 
+    evitar repetições - bem presentes na Estrutura 4
+
+    Para a Estrutura 3, cada valor do conjunto_de_valores é uma tupla 
+    (int movieId, float rating)
+    Para a Estrutura 4, cada valor do conjunto_de_valores é um int movieId 
+
+    ListHashTable(size, keytype)
+        Função de construção da tabela
+        int size: é o número de buckets da tabela
+        string keytype: indica o tipo de chave a ser usada. Por padrão é 'int', 
+        para chaves do tipo int, mas deve ser 'str' para chaves do tipo string
+        Retorna uma instância da classe
+    
+    _intHash(key)
+        Função de hash de uso interno da tabela, caso keytype == 'int'
+        int key: chave da entrada
+        Retorna índice da tabela 
+
+    _strHash(key)
+        Função de hash de uso interno da tabela, caso keytype == 'str'
+        string key: chave da entrada
+        Retorna índice da tabela 
+
+    insert(key, value)
+        Função de inserção de entrada na tabela
+        int|string key: chave da entrada. Tipo depende de keytype
+        any value: valor da entrada a ser associado à chave. Tipo qualquer
+        Estrutura 3 terá key como int userId e value como (int movieId, float rating)
+        Estrutura 4 terá key como string tag e value como int movieId
+        Primeira inserção de cada chave criará uma nova entrada, 
+        inserções subsequentes colocam value no conjunto_de_valores associado à chave.
+
+    search(key)
+        Função de procura na tabela
+        int|string key: chave da entrada. Tipo depende de keytype
+        Se chave está na lista, retorna o conjunto_de_valores associado à chave        
+        Se chave não está na lista, retorna booleano False
+
+Pesquisa 1:
+    exemplo de sintaxe: prefixo America
+    Entrada: string prefixo
+    Saída: lista de filmes e seus dados, ordenada
+    Cada item da lista apresentará as seguintes informações:
+    movieId, title, genres, year, rating, count
+
+    1. Pesquisa na Estrutura 2 pelo prefixo, retornando uma lista de movieIds
+    2. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme
+    3. Ordenação dessa lista em ordem decrescente de rating
+    4. Impressão na tela conforme especificado
+
+Pesquisa 2:
+    exemplo de sintaxe: user 54766
+    Entrada: int userId
+    Saída: lista de (até 20) filmes e seus dados, ordenada
+    Cada item da lista apresentará as seguintes informações:
+    movieId, title, genres, year, global_rating, count, rating
+
+    1. Pesquisa na Estrutura 3 pelo userId, retornando uma lista de movieIds e ratings do usuário
+    2. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme 
+    3. Ordenação dupla dessa lista: primariamente por rating e secundariamente por global_rating
+    4. Impressão na tela conforme especificado
+
+Pesquisa 3:
+    exemplo de sintaxe: top20 'Mystery'
+    Entrada: int n_filmes, string gênero
+    Saída: lista de (até 20) filmes e seus dados, ordenada
+    Cada item da lista apresentará as seguintes informações:
+    movieId, title, genres, year, rating, count
+
+    1. Pesquisa na Estrutura 3 pelo userId, retornando uma lista de movieIds e ratings do usuário
+    2. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme 
+    3. Ordenação dupla dessa lista: primariamente por rating e secundariamente por global_rating
+    4. Impressão na tela conforme especificado
+
+
+
+
+
+
+Coisas a fazer:
+    Estrutura 2
+    Função de ordenação da Pesquisa 1
+    Função de ordenação da Pesquisa 2

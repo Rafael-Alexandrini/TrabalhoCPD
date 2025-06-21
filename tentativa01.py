@@ -106,7 +106,7 @@ for row in movies_file.itertuples(index=False):
     movies_hash.insert(movie_list)
 
 
-### Leitura de miniratings.csv
+### Leitura de ratings.csv
 ratings_file = pandas.read_csv("./ratings.csv", 
                                usecols=["userId", "movieId", "rating"], 
                                dtype={"userId":int, "movieId":int, "rating":float})
