@@ -40,18 +40,21 @@ Estrutura 2: Alguma Árvore de Prefixos. A ser feita
             e fazer um encaminhamento que retorne toda a sub-árvore
             a partir dele
 
-Estrutura 3 e 4: ListHashTable - Tabela Hash com múltiplas entradas por chave
+Estrutura 3, 4 e 5: ListHashTable - Tabela Hash com múltiplas entradas por chave
     A mesma classe é usada para ambas estruturas, com uma modificação:
     na construção há escolha do tipo de chave que será usada: int ou string
     Cada entrada da tabela é uma tupla de uma chave e de um conjunto
     (int|string chave, {conjunto_de_valores})
     set conjunto_de_valores é o conjunto de valores relacionado à chave
     Foi escolhido usar um conjunto em vez de uma lista para 
-    evitar repetições - bem presentes na Estrutura 4
+    evitar repetições - bem presentes na Estrutura 4. Deve ser repensado se 
+    vale a pena usar sets pela conveniência, ou se usamos listas pela velocidade
+    (ou até criar uma opção para usar conjuntos, e deixar listas para o ratings.csv)
 
     Para a Estrutura 3, cada valor do conjunto_de_valores é uma tupla 
     (int movieId, float rating)
     Para a Estrutura 4, cada valor do conjunto_de_valores é um int movieId 
+    Para a Estrutura 5 (pesquisa 3), cada valor é um movieId
 
     ListHashTable(size, keytype)
         Função de construção da tabela
@@ -76,6 +79,7 @@ Estrutura 3 e 4: ListHashTable - Tabela Hash com múltiplas entradas por chave
         any value: valor da entrada a ser associado à chave. Tipo qualquer
         Estrutura 3 terá key como int userId e value como (int movieId, float rating)
         Estrutura 4 terá key como string tag e value como int movieId
+        Estrutura 5 terá key como string genre e value como int movieId
         Primeira inserção de cada chave criará uma nova entrada, 
         inserções subsequentes colocam value no conjunto_de_valores associado à chave.
 
@@ -111,16 +115,31 @@ Pesquisa 2:
 
 Pesquisa 3:
     exemplo de sintaxe: top20 'Mystery'
-    Entrada: int n_filmes, string gênero
-    Saída: lista de (até 20) filmes e seus dados, ordenada
+    Entrada: int n_filmes, string genre
+    Saída: lista de n_filmes filmes e seus dados, ordenada
     Cada item da lista apresentará as seguintes informações:
     movieId, title, genres, year, rating, count
 
-    1. Pesquisa na Estrutura 3 pelo userId, retornando uma lista de movieIds e ratings do usuário
-    2. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme 
-    3. Ordenação dupla dessa lista: primariamente por rating e secundariamente por global_rating
-    4. Impressão na tela conforme especificado
+    Para essa pesquisa será útil criar uma quinta estrutura, 
+    similar à Estrutura 4, guardando filmes por gênero em vez de por tag
 
+    1. Pesquisa na Estrutura 5 pelo genre, retornando uma lista de movieIds
+    2. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme (com count>=1000)
+    3. Ordenação dessa lista em ordem decrescente de rating
+    4. Impressão na tela conforme especificado (até n_filmes filmes)
+
+Pesquisa 4: 
+    exemplo de sintaxe: tags 'feel good' 'predictable'
+    Entrada: string tag1, string tag2
+    Saída: lista de filmes e seus dados, ordenada
+    Cada item da lista apresentará as seguintes informações:
+    movieId, title, genres, year, rating, count
+
+    1. Pesquisa na Estrutura 4 pelas tags, retornando duas listas de movieIds
+    2. Criação nova lista pela intersecção das listas de movieIds
+    3. Pesquisa iterada na Estrutura 1, criando uma lista contendo os dados de cada filme
+    4. Ordenação dessa lista em ordem decrescente de rating
+    5. Impressão na tela conforme especificado
 
 
 
@@ -128,5 +147,5 @@ Pesquisa 3:
 
 Coisas a fazer:
     Estrutura 2
-    Função de ordenação da Pesquisa 1
+    Função de ordenação da Pesquisa 1 e 3
     Função de ordenação da Pesquisa 2

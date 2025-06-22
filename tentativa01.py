@@ -100,10 +100,15 @@ movies_file = pandas.read_csv("./movies.csv",
                               dtype={"movieId":int, "title":str, "genres": str, "year": int})
 # Construção da tabela hash
 movies_hash = HashTable(3000)
+genres_hash = ListHashTable(50, keytype='str')
 for row in movies_file.itertuples(index=False):
     movie_list = list(i for i in row)
     movie_list.extend([0, 0])
     movies_hash.insert(movie_list)
+    
+    for genre in movie_list[2].split("|"):
+        genres_hash.insert(genre, movie_list[0])
+
 
 
 ### Leitura de ratings.csv
@@ -133,6 +138,7 @@ print(build_time)
 #         TESTES
 # ========================
 if __name__ == "__main__":
+    print("Fim")
     #print(movies_hash.search(1))
     #print(movies_hash.search(221))
     #print(movies_hash.search(131262))
@@ -146,11 +152,15 @@ if __name__ == "__main__":
             print("Diferente!")
             print(ratings_hash.search(i))
 
-    print("Fim")"""
+    """
 
     #print(len(tags_hash.search("tentou sair do clichÃª")) == len(set(tags_hash.search("tentou sair do clichÃª"))))
     #print(tags_hash.search("tentou sair do clichÃª"))
     #print(tags_hash.search("Mark Waters"))
-    print(tags_hash.search("dark hero"))
-
+    #print(tags_hash.search("dark hero"))
+    
+    print(genres_hash.search("Comedy"))
+    print(genres_hash.search("Comed"))
+    print(genres_hash.search("Action"))
+    
     
