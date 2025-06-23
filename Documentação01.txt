@@ -43,17 +43,14 @@ Estrutura 2: Alguma Árvore de Prefixos. A ser feita
 Estrutura 3, 4 e 5: ListHashTable - Tabela Hash com múltiplas entradas por chave
     A mesma classe é usada para ambas estruturas, com uma modificação:
     na construção há escolha do tipo de chave que será usada: int ou string
-    Cada entrada da tabela é uma tupla de uma chave e de um conjunto
-    (int|string chave, {conjunto_de_valores})
-    set conjunto_de_valores é o conjunto de valores relacionado à chave
-    Foi escolhido usar um conjunto em vez de uma lista para 
-    evitar repetições - bem presentes na Estrutura 4. Deve ser repensado se 
-    vale a pena usar sets pela conveniência, ou se usamos listas pela velocidade
-    (ou até criar uma opção para usar conjuntos, e deixar listas para o ratings.csv)
+    Cada entrada da tabela é uma tupla de uma chave e de uma lista
+    (int|string chave, [lista_de_valores])
+    list lista_de_valores é a lista de valores relacionado à chave
 
-    Para a Estrutura 3, cada valor do conjunto_de_valores é uma tupla 
+
+    Para a Estrutura 3, cada valor do lista_de_valores é uma tupla 
     (int movieId, float rating)
-    Para a Estrutura 4, cada valor do conjunto_de_valores é um int movieId 
+    Para a Estrutura 4, cada valor do lista_de_valores é um int movieId 
     Para a Estrutura 5 (pesquisa 3), cada valor é um movieId
 
     ListHashTable(size, keytype)
@@ -81,12 +78,12 @@ Estrutura 3, 4 e 5: ListHashTable - Tabela Hash com múltiplas entradas por chav
         Estrutura 4 terá key como string tag e value como int movieId
         Estrutura 5 terá key como string genre e value como int movieId
         Primeira inserção de cada chave criará uma nova entrada, 
-        inserções subsequentes colocam value no conjunto_de_valores associado à chave.
+        inserções subsequentes colocam value na lista_de_valores associado à chave.
 
     search(key)
         Função de procura na tabela
         int|string key: chave da entrada. Tipo depende de keytype
-        Se chave está na lista, retorna o conjunto_de_valores associado à chave        
+        Se chave está na lista, retorna a lista_de_valores associado à chave        
         Se chave não está na lista, retorna booleano False
 
 Pesquisa 1:
@@ -128,6 +125,12 @@ Pesquisa 3:
     3. Ordenação dessa lista em ordem decrescente de rating
     4. Impressão na tela conforme especificado (até n_filmes filmes)
 
+    Depois de investigar, parece que só tem os seguintes gêneros (20):
+    Western, Action, Horror, War, Comedy, Film-Noir, Crime, Romance, Mystery, Drama, 
+    Musical, IMAX, (no genres listed), Animation, Children, Adventure, Sci-Fi, Fantasy,
+    Thriller, Documentary
+    Então podemos criar uma lista para cada 
+
 Pesquisa 4: 
     exemplo de sintaxe: tags 'feel good' 'predictable'
     Entrada: string tag1, string tag2
@@ -147,5 +150,5 @@ Pesquisa 4:
 
 Coisas a fazer:
     Estrutura 2
-    Função de ordenação da Pesquisa 1 e 3
+    Função de ordenação da Pesquisa 1, 3 e 4
     Função de ordenação da Pesquisa 2

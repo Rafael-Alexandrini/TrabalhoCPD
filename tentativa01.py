@@ -32,6 +32,32 @@ class HashTable:
         # chave não encontrada
         return False
 
+    def ocupacao(self):
+        n_ocupadas = 0
+        for list in self.table:
+            if len(list) > 0:
+                n_ocupadas += 1
+
+        return n_ocupadas / self.size
+    
+    def tamMaxLista(self):
+        max_length = 0
+        for list in self.table:
+            if max_length < len(list):
+                max_length = len(list)
+        return max_length
+
+    def tamMedioLista(self):
+        sum_lengths = 0
+        n_filled = 0
+        for list in self.table:
+            if len(list) > 0:
+                sum_lengths += len(list)
+                n_filled += 1
+        
+        if n_filled == 0:
+            return 0
+        return sum_lengths / n_filled
 
 ### Definição da Tabela Hash, Estrutura 3, 4 e P3
 class ListHashTable: 
@@ -66,10 +92,10 @@ class ListHashTable:
             index = self._intHash(key) 
         for item in self.table[index]:
             if key == item[0]:
-                item[1].add(value)
+                item[1].append(value)
                 return
             
-        self.table[index].append((key, {value}))
+        self.table[index].append((key, [value]))
     
     def search(self, key):
         """Procura pela entrada de chave key
@@ -85,7 +111,110 @@ class ListHashTable:
                 return entry[1]
         # chave não encontrada
         return False
+    
+    def ocupacao(self):
+        n_ocupadas = 0
+        for list in self.table:
+            if len(list) > 0:
+                n_ocupadas += 1
 
+        return n_ocupadas / self.size
+    
+    def tamMaxLista(self):
+        max_length = 0
+        for list in self.table:
+            if max_length < len(list):
+                max_length = len(list)
+        return max_length
+
+    def tamMedioLista(self):
+        sum_lengths = 0
+        n_filled = 0
+        for list in self.table:
+            if len(list) > 0:
+                sum_lengths += len(list)
+                n_filled += 1
+        
+        if n_filled == 0:
+            return 0
+        return sum_lengths / n_filled    
+
+
+
+def pesquisa2(userID):
+    global movies_hash, ratings_hash
+    
+    ratingsList = ratings_hash.search(userID)
+    
+    if ratingsList == False:
+        print("Usuário não fez avaliações.")
+        return
+    
+    moviesList = list()
+    for rating in ratingsList:
+        temp_movie = movies_hash.search(rating[0])
+        if temp_movie != False:
+            moviesList.append([*temp_movie, rating[1]])
+    
+    if len(moviesList) == 0:
+        print("Sem filmes avaliados por esse usuário!")
+        return
+    
+    for movie in itertools.islice(moviesList, 20):
+        print(movie)
+    # moviesList é a lista de filmes avaliado pelo usuário, conforme a etapa 2 da documentação
+    # o que resta fazer é ordenar pela rating e global_rating e fazer print usando o pandas
+    
+def pesquisa3(n_filmes, genre):
+    global movies_hash, genres_hash
+
+    idList = genres_hash.search(genre)
+    if idList == False:
+        print("Não há filmes deste gênero!")
+        return
+    
+    moviesList = list()
+    for id in idList:
+        temp_movie = movies_hash.search(id)
+        if temp_movie != False and temp_movie[5] >= 1000:
+            moviesList.append(temp_movie)
+        
+    if len(moviesList) == 0:
+        print("Não há filmes deste gênero!") 
+        return
+    
+    for movie in moviesList:
+        if movie[4] > 4:
+            print(movie)
+    # moviesList é a lista de filmes que tem o gênero, conforme a etapa 2 da documentação
+    # o que resta fazer é ordenar pela rating e fazer print dos n_filmes usando o pandas
+
+def pesquisa4(tag1, tag2):
+    global tags_hash, movies_hash
+    
+    listTag1 = tags_hash.search(tag1)
+    listTag2 = tags_hash.search(tag2)
+
+    if listTag1 == False or listTag2 == False:
+        print("Tag não existe!")
+        return
+
+    intersecSet = set(listTag1).intersection(set(listTag2))
+
+    moviesList = list()
+    for id in intersecSet:
+        temp_movie = movies_hash.search(id)
+        if temp_movie != False:
+            moviesList.append(temp_movie)
+
+    if len(moviesList) == 0:
+        print("Sem filmes com ambas as tags!")
+        return
+    
+    for movie in moviesList:
+        print(movie)
+    # moviesList é a lista de filmes que tem ambas tags, conforme a etapa 3 da documentação
+    # o que resta fazer é ordenar pela rating e fazer print usando o pandas
 
 
 # ===========================
@@ -97,10 +226,10 @@ start_time = time.perf_counter()
 
 ### Leitura de movies.csv
 movies_file = pandas.read_csv("./movies.csv", 
-                              dtype={"movieId":int, "title":str, "genres": str, "year": int})
+                            dtype={"movieId":int, "title":str, "genres": str, "year": int})
 # Construção da tabela hash
-movies_hash = HashTable(3000)
-genres_hash = ListHashTable(50, keytype='str')
+movies_hash = HashTable(10000)
+genres_hash = ListHashTable(20, keytype='str')
 for row in movies_file.itertuples(index=False):
     movie_list = list(i for i in row)
     movie_list.extend([0, 0])
@@ -112,21 +241,29 @@ for row in movies_file.itertuples(index=False):
 
 
 ### Leitura de ratings.csv
-ratings_file = pandas.read_csv("./ratings.csv", 
-                               usecols=["userId", "movieId", "rating"], 
-                               dtype={"userId":int, "movieId":int, "rating":float})
+ratings_file = pandas.read_csv("./miniratings.csv", 
+                            usecols=["userId", "movieId", "rating"], 
+                            dtype={"userId":int, "movieId":int, "rating":float})
 # Construção da estrutura 3
-ratings_hash = ListHashTable(150000)
+ratings_hash = ListHashTable(45000)
 for row in ratings_file.itertuples(index=False):
     ratings_hash.insert(row[0], (row[1], row[2]))
+    temp_movie = movies_hash.search(row[1])
+    if temp_movie != False:
+        temp_movie[4] += row[2]
+        temp_movie[5] += 1
 
+for bucket in movies_hash.table:
+    for entry in bucket:
+        if entry[5] != 0:
+            entry[4] = entry[4]/entry[5]
 
 # Leitura de tags.csv
 tags_file = pandas.read_csv("./tags.csv", 
                             usecols=["movieId","tag"], 
                             dtype={"movieId":int, "tag":str})
 # Construção da estrutura 4
-tags_hash = ListHashTable(40000, keytype='str')
+tags_hash = ListHashTable(20000, keytype='str')
 for row in tags_file.itertuples(index=False):
     tags_hash.insert(row[1], row[0])
 
@@ -134,33 +271,72 @@ for row in tags_file.itertuples(index=False):
 end_time = time.perf_counter()
 build_time = (end_time - start_time)*1000
 print(build_time)
+print("Fim")
+
 # ========================
-#         TESTES
+#   Cemitério dos Testes
 # ========================
-if __name__ == "__main__":
-    print("Fim")
-    #print(movies_hash.search(1))
-    #print(movies_hash.search(221))
-    #print(movies_hash.search(131262))
-    """
-    print(pandas.DataFrame(ratings_hash.search(1), columns=["MovieId", "Rating"]))
-    #print(ratings_hash.search(99))
-    #print(ratings_hash.search(91))
 
-    for i in range(1, 92):
-        if len(ratings_hash.search(i)) != len(set(ratings_hash.search(i))):
-            print("Diferente!")
-            print(ratings_hash.search(i))
+"""pesquisa2(0)
+print(1)
+pesquisa2(1)
+print(2)
+pesquisa2(2)"""
 
-    """
+#pesquisa3(20, "Myster")
 
-    #print(len(tags_hash.search("tentou sair do clichÃª")) == len(set(tags_hash.search("tentou sair do clichÃª"))))
-    #print(tags_hash.search("tentou sair do clichÃª"))
-    #print(tags_hash.search("Mark Waters"))
-    #print(tags_hash.search("dark hero"))
+#pesquisa4("feelgood", "feelgod")
+
+#print(movies_hash.search(102107))
+#print(movies_hash.search(2858))
+
+#print(movies_hash.search(1))
+#print(movies_hash.search(221))
+#print(movies_hash.search(131262))
+"""
+print(pandas.DataFrame(ratings_hash.search(1), columns=["MovieId", "Rating"]))
+#print(ratings_hash.search(99))
+#print(ratings_hash.search(91))
+
+for i in range(1, 92):
+    if len(ratings_hash.search(i)) != len(set(ratings_hash.search(i))):
+        print("Diferente!")
+        print(ratings_hash.search(i))
+
+"""
+
+#print(len(tags_hash.search("tentou sair do clichÃª")) == len(set(tags_hash.search("tentou sair do clichÃª"))))
+#print(tags_hash.search("tentou sair do clichÃª"))
+#print(tags_hash.search("Mark Waters"))
+#print(tags_hash.search("dark hero"))
+
+"""print(genres_hash.search("Comedy"))
+print(genres_hash.search("Comed"))
+print(genres_hash.search("Action"))"""
+"""print("Movies_Hash: Ocupação, tamMax, tamMedio")
+print(movies_hash.size)
+print(movies_hash.ocupacao())
+print(movies_hash.tamMaxLista())
+print(movies_hash.tamMedioLista())
+print("Ratings_Hash: Ocupação, tamMax, tamMedio")
+print(ratings_hash.size)
+print(ratings_hash.ocupacao())
+print(ratings_hash.tamMaxLista())
+print(ratings_hash.tamMedioLista())
+print("Tags_Hash: Ocupação, tamMax, tamMedio")
+print(tags_hash.size)
+print(tags_hash.ocupacao())
+print(tags_hash.tamMaxLista())
+print(tags_hash.tamMedioLista())
+print("Genres_Hash: Ocupação, tamMax, tamMedio")
+print(genres_hash.size)
+print(genres_hash.ocupacao())
+print(genres_hash.tamMaxLista())
+print(genres_hash.tamMedioLista())"""
+"""for bucket in genres_hash.table:
+    for entry in bucket:
+        print(entry[0])"""
+
+
     
-    print(genres_hash.search("Comedy"))
-    print(genres_hash.search("Comed"))
-    print(genres_hash.search("Action"))
-    
-    
+
