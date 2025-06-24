@@ -12,9 +12,8 @@ def ordenar_por_nota_global(filmes):
     return filmes
 
 def ordenar_por_nota_usuario_e_global(filmes):
-   # Ordena a lista de filmes primeiro pela nota do usuário (filme[6]) desc,
-   # e depois pela nota global (filme[4]) desc.
-   
+   # Ordena a lista de filmes primeiro pela nota do usuário desc,  e depois pela nota global desc.
+  
     n = len(filmes)
     for i in range(n):
         max_idx = i
