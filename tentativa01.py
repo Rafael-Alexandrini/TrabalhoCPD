@@ -2,6 +2,7 @@ import pandas
 import itertools
 import time
 import tentativaOrdenacao
+import tentativaConsultas
 
 ### Definição da Tabela Hash, Estrutura 1
 class HashTable: 
@@ -214,7 +215,7 @@ def pesquisa1(prefixo):
     idList = title_trie.prefixSearch(prefixo)
     
     if len(idList) == 0:
-        print("Sem filmes com este prefixo!")
+        return "prefixo", [[("Sem filmes com este prefixo!")]]
         return
     
     moviesList = list()
@@ -224,11 +225,10 @@ def pesquisa1(prefixo):
             moviesList.append(temp_movie)
 
     if len(moviesList) == 0:
-        print("Não há filmes com este prefixo!") 
-        return
+        return "prefixo", [[("Não há filmes com este prefixo!")]]
     
     for movie in tentativaOrdenacao.ordenar_por_nota_global(moviesList):
-        print(movie)
+        return "prefixo", (moviesList)
     
 def pesquisa2(userID):
     global movies_hash, ratings_hash
@@ -236,8 +236,7 @@ def pesquisa2(userID):
     ratingsList = ratings_hash.search(userID)
     
     if ratingsList == False:
-        print("Usuário não fez avaliações.")
-        return
+        return "user", [[("Usuário não fez avaliações.")]]
     
     moviesList = list()
     for rating in ratingsList:
@@ -246,20 +245,17 @@ def pesquisa2(userID):
             moviesList.append([*temp_movie, rating[1]])
     
     if len(moviesList) == 0:
-        print("Sem filmes avaliados por esse usuário!")
-        return
+        return "user", [[("Sem filmes avaliados por esse usuário!")]]
     
     for movie in itertools.islice(tentativaOrdenacao.ordenar_por_nota_usuario_e_global(moviesList), 20):
-        print(movie)
-    # o que resta fazer é fazer print bonitinho
+        return "user", (moviesList)
     
 def pesquisa3(n_filmes, genre):
     global movies_hash, genres_hash
 
     idList = genres_hash.search(genre)
     if idList == False:
-        print("Não há filmes deste gênero!")
-        return
+        return "top", [[("Não há filmes deste gênero!")]]
     
     moviesList = list()
     for id in idList:
@@ -268,12 +264,10 @@ def pesquisa3(n_filmes, genre):
             moviesList.append(temp_movie)
         
     if len(moviesList) == 0:
-        print("Não há filmes deste gênero!") 
-        return
+        return "top", [[("Não há filmes deste gênero!")]]
     
     for movie in itertools.islice(tentativaOrdenacao.ordenar_por_nota_global(moviesList), n_filmes):
-        print(movie)
-    # o que resta fazer é fazer print bonitinho
+       return "top", moviesList[:n_filmes]
 
 def pesquisa4(tag1, tag2):
     global tags_hash, movies_hash
@@ -282,8 +276,7 @@ def pesquisa4(tag1, tag2):
     listTag2 = tags_hash.search(tag2)
 
     if listTag1 == False or listTag2 == False:
-        print("Tag não existe!")
-        return
+        return "tags", [[("Tag não existe!")]]
 
     intersecSet = set(listTag1).intersection(set(listTag2))
 
@@ -294,13 +287,10 @@ def pesquisa4(tag1, tag2):
             moviesList.append(temp_movie)
 
     if len(moviesList) == 0:
-        print("Sem filmes com ambas as tags!")
-        return
+        return "tags", [[("Sem filmes com ambas as tags!")]]
     
     for movie in tentativaOrdenacao.ordenar_por_nota_global(moviesList):
-        print(movie)
-    # o que resta fazer é fazer print bonitinho
-
+        return "tags", (moviesList)
 
 # ===========================
 #  CONSTRUÇÃO DAS ESTRUTURAS
