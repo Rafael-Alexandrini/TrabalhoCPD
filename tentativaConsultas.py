@@ -1,3 +1,4 @@
+
 # Verifica se um caractere é um dígito (0 a 9)
 def e_digito(c):
     return c >= '0' and c <= '9'
@@ -30,26 +31,21 @@ def remover_espacos(s):
             resultado += s[i]
         return resultado
 
-def consultas():
-    while True:
-        comando = input(">>> ")  # Lê o comando digitado
-
-        if comando == "sair":
-            break  # Encerra o programa
+def consultas(comando):
 
         # Verifica comando que começa com "prefixo "
         if len(comando) >= 8 and comando[:8] == "prefixo ":
-            prefix = remover_espacos(comando[8:])  # remove espaços após o comando
-            pesquisa_por_prefixo(prefix)
+            prefixo = remover_espacos(comando[8:])  # remove espaços após o comando
+            return pesquisa1(prefixo)
 
         # Verifica comando que começa com "user "
         elif len(comando) >= 5 and comando[:5] == "user ":
             parte = remover_espacos(comando[5:])
             user_id = string_para_inteiro(parte)
             if user_id != -1:
-                pesquisa_por_usuario(user_id)
+                return pesquisa2(user_id)
             else:
-                print("UserID inválido.")
+                return "erro", [[("UserID inválido.")]]
 
         # Verifica comando que começa com "top" e um número
         elif len(comando) >= 3 and comando[:3] == "top":
@@ -74,9 +70,9 @@ def consultas():
                 i += 1
 
             if n != -1:
-                pesquisa_por_genero(n, genero)
+                return pesquisa3(n, genero)
             else:
-                print("Comando top inválido.")
+                return "erro", print("Comando top inválido.")
 
         # Verifica comando que começa com "tags" e contém duas strings entre aspas
         elif len(comando) >= 4 and comando[:4] == "tags":
@@ -95,12 +91,57 @@ def consultas():
                     atual += c
 
             if len(partes) == 2:
-                pesquisa_por_tags(partes[0], partes[1])
+               return pesquisa4(partes[0], partes[1])
             else:
-                print("Formato esperado: tags 'tag1' 'tag2'")
+                return "erro", [[("Formato esperado: tags 'tag1' 'tag2'")]]
 
         else:
-            print("Comando não reconhecido.")
+           return "erro", [[("Comando não reconhecido.")]]
+
+def interface():
+    janela = tk.Tk()
+    janela.title("MovieLens")
+
+    pesquisa = tk.Entry(janela, width=60)
+    pesquisa.pack(padx =10, pady=10)
+
+    def ao_clicar():
+        comando = remover_espacos(pesquisa.get())
+        tipo, resultado = consultas(comando)
+        atualizar_tabela(tipo, resultado)
+
+    botao = tk.Button(janela, text="Pesquisar", command=ao_clicar)
+    botao.pack(padx=5)
+
+    tabela = ttk.Treeview(janela, show="headings")
+    tabela.pack(padx=10, pady=10, fill="both", expand=True)
+
+    def limpar_tabela():
+        for col in tabela["columns"]:
+            tabela.heading(col, text="")
+        tabela.delete(*tabela.get_children())
+        tabela["columns"] = []
+
+    def atualizar_tabela(tipo, resultados):
+        limpar_tabela()
+
+        if tipo == "prefixo" or tipo == "top" or tipo == "tags":
+            colunas = ["movieId", "title", "genres", "year", "rating", "count"]
+        elif tipo == "user":
+            colunas = ["movieId", "title", "genres", "year", "global rating", "count", "rating"]
+        else:
+            tabela.insert("", "end", values=(resultados[0],))
+            return
+
+        tabela["columns"] = colunas
+        for col in colunas:
+            tabela.heading(col, text=col)
+            tabela.column(col, anchor="w", width=100)
+
+        for item in resultados:
+            tabela.insert("", "end", values=item)
+
+    janela.mainloop()
 
 if __name__ == "__main__":
-    consultas()
+    interface()
