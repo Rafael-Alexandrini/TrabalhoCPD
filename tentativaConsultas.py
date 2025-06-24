@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import ttk
 
 # Verifica se um caractere é um dígito (0 a 9)
 def e_digito(c):
