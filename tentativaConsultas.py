@@ -99,7 +99,7 @@ def consultas(comando):
                 return "erro", [[("Formato esperado: tags 'tag1' 'tag2'")]]
 
         else:
-           return "erro", [[("Comando não reconhecido.")]]
+           return "prefixo", [[("Comando não reconhecido.")]]
 def interface():
     janela = tk.Tk()
     janela.title("MovieLens")
@@ -141,7 +141,14 @@ def interface():
             tabela.column(col, anchor="w", width=100)
 
         for item in resultados:
-            tabela.insert("", "end", values=item)
+            nova_linha = []
+            for valor in item:
+                if type(valor) == float:
+                    valor_formatado = "{:.6f}".format(valor) 
+                    nova_linha.append(valor_formatado)
+                else:
+                    nova_linha.append(valor)
+            tabela.insert("", "end", values=nova_linha)
 
     janela.mainloop()
 
