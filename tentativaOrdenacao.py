@@ -1,34 +1,73 @@
-def ordenar_por_nota_global(filmes):
-    #Ordena a lista de filmes em ordem decrescente da nota global.
-  
-    n = len(filmes)
-    for i in range(n):
-        max_idx = i
-        for j in range(i + 1, n):
-            if filmes[j][4] > filmes[max_idx][4]:  # Comparando média global
-                max_idx = j
-        # Troca os elementos
-        filmes[i], filmes[max_idx] = filmes[max_idx], filmes[i]
-    return filmes
+import random
 
-def ordenar_por_nota_usuario_e_global(filmes):
-   # Ordena a lista de filmes primeiro pela nota do usuário desc,  e depois pela nota global desc.
-  
-    n = len(filmes)
-    for i in range(n):
-        max_idx = i
-        for j in range(i + 1, n):
-            # Compara nota do usuário
-            nota_user_j = filmes[j][6]
-            nota_user_max = filmes[max_idx][6]
+def ordenar_por_nota_global(filmes, inicio=0, fim=None):
+    if fim is None:
+        fim = len(filmes) - 1
+    if inicio < fim:
+        p = particiona_hoare_global(filmes, inicio, fim)
+        ordenar_por_nota_global(filmes, inicio, p)
+        ordenar_por_nota_global(filmes, p + 1, fim)
+def particiona_hoare_global(filmes, inicio, fim):
+    pivot_index = random.randint(inicio, fim)
+    pivot = filmes[pivot_index][4]  # nota global
+    filmes[inicio], filmes[pivot_index] = filmes[pivot_index], filmes[inicio]
 
-            if nota_user_j > nota_user_max:
-                max_idx = j
-            elif nota_user_j == nota_user_max:
-                # Se iguais, compara pela nota global
-                if filmes[j][4] > filmes[max_idx][4]:
-                    max_idx = j
+    i = inicio - 1
+    j = fim + 1
+    while True:
+        while True:
+            i += 1
+            if filmes[i][4] > pivot:  # maior vai pro início
+                continue
+            break
+        while True:
+            j -= 1
+            if filmes[j][4] < pivot:  # menor vai pro final
+                continue
+            break
+        if i >= j:
+            return j
+        filmes[i], filmes[j] = filmes[j], filmes[i]
 
-        filmes[i], filmes[max_idx] = filmes[max_idx], filmes[i]
-    return filmes
+def ordenar_por_nota_usuario_e_global(filmes, inicio=0, fim=None):
+    if fim is None:
+        fim = len(filmes) - 1
+    if inicio < fim:
+        p = particiona_hoare_usuario_global(filmes, inicio, fim)
+        ordenar_por_nota_usuario_e_global(filmes, inicio, p)
+        ordenar_por_nota_usuario_e_global(filmes, p + 1, fim)
 
+def particiona_hoare_usuario_global(filmes, inicio, fim):
+    pivot_index = random.randint(inicio, fim)
+    pivot = filmes[pivot_index]
+    filmes[inicio], filmes[pivot_index] = filmes[pivot_index], filmes[inicio]
+
+    i = inicio - 1
+    j = fim + 1
+    while True:
+        while True:
+            i += 1
+            if compara_filmes(filmes[i], pivot) < 0:
+                continue
+            break
+        while True:
+            j -= 1
+            if compara_filmes(filmes[j], pivot) > 0:
+                continue
+            break
+        if i >= j:
+            return j
+        filmes[i], filmes[j] = filmes[j], filmes[i]
+
+def compara_filmes(a, b):
+    if a[6] > b[6]:
+        return -1
+    elif a[6] < b[6]:
+        return 1
+    else:
+        if a[4] > b[4]:
+            return -1
+        elif a[4] < b[4]:
+            return 1
+        else:
+            return 0
