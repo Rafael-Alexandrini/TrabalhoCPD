@@ -1,3 +1,4 @@
+import tentativa01
 import tkinter as tk
 from tkinter import ttk
 
@@ -38,14 +39,14 @@ def consultas(comando):
         # Verifica comando que começa com "prefixo "
         if len(comando) >= 8 and comando[:8] == "prefixo ":
             prefixo = remover_espacos(comando[8:])  # remove espaços após o comando
-            return pesquisa1(prefixo)
+            return tentativa01.pesquisa1(prefixo)
 
         # Verifica comando que começa com "user "
         elif len(comando) >= 5 and comando[:5] == "user ":
             parte = remover_espacos(comando[5:])
             user_id = string_para_inteiro(parte)
             if user_id != -1:
-                return pesquisa2(user_id)
+                return tentativa01.pesquisa2(user_id)
             else:
                 return "erro", [[("UserID inválido.")]]
 
@@ -72,7 +73,7 @@ def consultas(comando):
                 i += 1
 
             if n != -1:
-                return pesquisa3(n, genero)
+                return tentativa01.pesquisa3(n, genero)
             else:
                 return "erro", print("Comando top inválido.")
 
@@ -93,13 +94,12 @@ def consultas(comando):
                     atual += c
 
             if len(partes) == 2:
-               return pesquisa4(partes[0], partes[1])
+               return tentativa01.pesquisa4(partes[0], partes[1])
             else:
                 return "erro", [[("Formato esperado: tags 'tag1' 'tag2'")]]
 
         else:
            return "erro", [[("Comando não reconhecido.")]]
-
 def interface():
     janela = tk.Tk()
     janela.title("MovieLens")
