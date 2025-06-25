@@ -227,8 +227,8 @@ def pesquisa1(prefixo):
     if len(moviesList) == 0:
         return "prefixo", [[("Não há filmes com este prefixo!")]]
     
-    for movie in tentativaOrdenacao.ordenar_por_nota_global(moviesList):
-        return "prefixo", (moviesList)
+    tentativaOrdenacao.ordenar_por_nota_global(moviesList)
+    return "prefixo", (moviesList)
     
 def pesquisa2(userID):
     global movies_hash, ratings_hash
@@ -247,8 +247,8 @@ def pesquisa2(userID):
     if len(moviesList) == 0:
         return "user", [[("Sem filmes avaliados por esse usuário!")]]
     
-    for movie in itertools.islice(tentativaOrdenacao.ordenar_por_nota_usuario_e_global(moviesList), 20):
-        return "user", moviesList[:20]
+    tentativaOrdenacao.ordenar_por_nota_usuario_e_global(moviesList)
+    return "user", moviesList[:20]
     
 def pesquisa3(n_filmes, genre):
     global movies_hash, genres_hash
@@ -266,8 +266,8 @@ def pesquisa3(n_filmes, genre):
     if len(moviesList) == 0:
         return "top", [[("Não há filmes deste gênero!")]]
     
-    for movie in itertools.islice(tentativaOrdenacao.ordenar_por_nota_global(moviesList), n_filmes):
-       return "top", moviesList[:n_filmes]
+    tentativaOrdenacao.ordenar_por_nota_global(moviesList)
+    return "top", moviesList[:n_filmes]
 
 def pesquisa4(tag1, tag2):
     global tags_hash, movies_hash
@@ -289,8 +289,8 @@ def pesquisa4(tag1, tag2):
     if len(moviesList) == 0:
         return "tags", [[("Sem filmes com ambas as tags!")]]
     
-    for movie in tentativaOrdenacao.ordenar_por_nota_global(moviesList):
-        return "tags", (moviesList)
+    tentativaOrdenacao.ordenar_por_nota_global(moviesList):
+    return "tags", (moviesList)
 
 # ===========================
 #  CONSTRUÇÃO DAS ESTRUTURAS
