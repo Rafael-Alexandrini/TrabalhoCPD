@@ -146,9 +146,3 @@ Pesquisa 4:
 
 
 
-
-
-Coisas a fazer:
-    Estrutura 2
-    Função de ordenação da Pesquisa 1, 3 e 4
-    Função de ordenação da Pesquisa 2

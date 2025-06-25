@@ -3,7 +3,10 @@ import itertools
 import time
 import tentativaOrdenacao
 
-### Definição da Tabela Hash, Estrutura 1
+# =====================================
+#  DEFINIÇÃO DE ESTRUTURAS E PESQUISAS
+# =====================================
+
 class HashTable: 
     def __init__(self, size):
         # Construtor
@@ -60,7 +63,6 @@ class HashTable:
             return 0
         return sum_lengths / n_filled
 
-### Definição da Tabela Hash, Estrutura 3, 4 e P3
 class ListHashTable: 
     """ É uma tabela hash na qual múltiplos elementos podem
     ser inseridos com uma mesma chave
@@ -206,8 +208,7 @@ class TrieNode:
                 movie_list.extend(son.listMovies())
 
         return movie_list
-
-            
+         
 def pesquisa1(prefixo):
     global movies_hash, title_trie
 
@@ -295,40 +296,46 @@ def pesquisa4(tag1, tag2):
 #  CONSTRUÇÃO DAS ESTRUTURAS
 # ===========================
 
-print("Começo")
 start_time = time.perf_counter()
 
-### Leitura de movies.csv
+
+### LEITURA DE MOVIES.CSV
 movies_file = pandas.read_csv("./movies.csv", 
-                            dtype={"movieId":int, "title":str, "genres": str, "year": int})
-# Construção da tabela hash
-movies_hash = HashTable(10000)
+                            dtype={"movieId":int, "title":str, "genres": str, "year": int}, 
+                            engine="pyarrow")
+
+movies_hash = HashTable(10007)
 genres_hash = ListHashTable(20, keytype='str')
 title_trie = TrieNode()
+
 for row in movies_file.itertuples(index=False):
+    # Inserção de filmes na movies_hash
     movie_list = list(i for i in row)
     movie_list.extend([0, 0])
     movies_hash.insert(movie_list)
     
+    # Inserção de filmes na genres_hash
     for genre in movie_list[2].split("|"):
         genres_hash.insert(genre, movie_list[0])
 
+    # Inserção de títulos na title_trie
     title_trie.insert(row[1], row[0])
 
 
 
-### Leitura de ratings.csv
+### LEITURA DE RATINGS.CSV
 ratings_file = pandas.read_csv("./ratings.csv", 
                             usecols=["userId", "movieId", "rating"], 
-                            dtype={"userId":int, "movieId":int, "rating":float})
-# Construção da estrutura 3
-ratings_hash = ListHashTable(45000)
+                            dtype={"userId":int, "movieId":int, "rating":"float32"}, 
+                            engine="pyarrow")
+
+ratings_hash = ListHashTable(45007)
+
 temp_userID = -1
 temp_pair_list = list()
 for row in ratings_file.itertuples(index=False):
-    #ratings_hash.insert(row[0], (row[1], row[2]))
-    # sistema para inserir vários ratings por vez
-    # fica uns 5 segundos mais rápido no meu computador :)
+    # Inserção de vários ratings por vez
+    # Equivale a ratings_hash.insert(row[0], (row[1], row[2]))
     if row[0] == temp_userID:
         temp_pair_list.append((row[1], row[2]))
     else:
@@ -337,124 +344,33 @@ for row in ratings_file.itertuples(index=False):
         temp_pair_list = [(row[1], row[2])]
         temp_userID = row[0]
 
+    # Cálculo da avaliação dos filmes
     temp_movie = movies_hash.search(row[1])
     if temp_movie != False:
         temp_movie[4] += row[2]
         temp_movie[5] += 1
 
-
+# Cálculo da avaliação dos filmes
 for bucket in movies_hash.table:
     for entry in bucket:
         if entry[5] != 0:
             entry[4] = entry[4]/entry[5]
 
-# Leitura de tags.csv
+
+
+### LEITURA DE TAGS.CSV
 tags_file = pandas.read_csv("./tags.csv", 
                             usecols=["movieId","tag"], 
-                            dtype={"movieId":int, "tag":str})
-# Construção da estrutura 4
-tags_hash = ListHashTable(20000, keytype='str')
+                            dtype={"movieId":int, "tag":str}, 
+                            engine="pyarrow")
+
+tags_hash = ListHashTable(19997, keytype='str')
+
 for row in tags_file.itertuples(index=False):
+    # Inserção de filmes na tags_hash
     tags_hash.insert(row[1], row[0])
 
-
+# Cálculo do tempo de construção das estruturas
 end_time = time.perf_counter()
 build_time = (end_time - start_time)*1000
 print(build_time)
-print("Fim")
-
-# ========================
-#   Cemitério dos Testes
-# ========================
-
-pesquisa1("America")
-    
-
-
-
-"""print(title_trie.search("Toy Story"))
-print(title_trie.search("Toy Story 2"))
-print(title_trie.search("Toy2"))
-print(title_trie.search("y"))
-print(title_trie.search("American Winter"))
-print(title_trie.search("H-Man, The (Bijo to Ekitainingen)"))"""
-
-
-#print(ratings_hash.search(1))
-
-"""print("Pesquisa 2:")
-pesquisa2(54766)
-print("Pesquisa 3:")
-pesquisa3(20, 'Mystery')
-print("Pesquisa 4:")
-pesquisa4("feel-good", "predictable")
-print("Pesquisa 2:")
-pesquisa2(0)
-print("Pesquisa 3:")
-pesquisa3(20, 'Mstery')
-print("Pesquisa 4:")
-pesquisa4("feel-god", "prediable")"""
-
-"""pesquisa2(0)
-print(1)
-pesquisa2(1)
-print(2)
-pesquisa2(2)"""
-
-#pesquisa3(20, "Myster")
-
-#pesquisa4("feelgood", "feelgod")
-
-#print(movies_hash.search(102107))
-#print(movies_hash.search(2858))
-
-#print(movies_hash.search(1))
-#print(movies_hash.search(221))
-#print(movies_hash.search(131262))
-"""
-print(pandas.DataFrame(ratings_hash.search(1), columns=["MovieId", "Rating"]))
-#print(ratings_hash.search(99))
-#print(ratings_hash.search(91))
-
-for i in range(1, 92):
-    if len(ratings_hash.search(i)) != len(set(ratings_hash.search(i))):
-        print("Diferente!")
-        print(ratings_hash.search(i))
-
-"""
-
-#print(len(tags_hash.search("tentou sair do clichÃª")) == len(set(tags_hash.search("tentou sair do clichÃª"))))
-#print(tags_hash.search("tentou sair do clichÃª"))
-#print(tags_hash.search("Mark Waters"))
-#print(tags_hash.search("dark hero"))
-
-"""print(genres_hash.search("Comedy"))
-print(genres_hash.search("Comed"))
-print(genres_hash.search("Action"))"""
-"""print("Movies_Hash: Ocupação, tamMax, tamMedio")
-print(movies_hash.size)
-print(movies_hash.ocupacao())
-print(movies_hash.tamMaxLista())
-print(movies_hash.tamMedioLista())
-print("Ratings_Hash: Ocupação, tamMax, tamMedio")
-print(ratings_hash.size)
-print(ratings_hash.ocupacao())
-print(ratings_hash.tamMaxLista())
-print(ratings_hash.tamMedioLista())
-print("Tags_Hash: Ocupação, tamMax, tamMedio")
-print(tags_hash.size)
-print(tags_hash.ocupacao())
-print(tags_hash.tamMaxLista())
-print(tags_hash.tamMedioLista())
-print("Genres_Hash: Ocupação, tamMax, tamMedio")
-print(genres_hash.size)
-print(genres_hash.ocupacao())
-print(genres_hash.tamMaxLista())
-print(genres_hash.tamMedioLista())"""
-"""for bucket in genres_hash.table:
-    for entry in bucket:
-        print(entry[0])"""
-
-
-    
-
