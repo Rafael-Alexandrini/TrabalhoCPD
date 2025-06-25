@@ -248,7 +248,7 @@ def pesquisa2(userID):
         return "user", [[("Sem filmes avaliados por esse usuário!")]]
     
     for movie in itertools.islice(tentativaOrdenacao.ordenar_por_nota_usuario_e_global(moviesList), 20):
-        return "user", (moviesList)
+        return "user", moviesList[:20]
     
 def pesquisa3(n_filmes, genre):
     global movies_hash, genres_hash
