@@ -2,7 +2,6 @@ import pandas
 import itertools
 import time
 import tentativaOrdenacao
-import tentativaConsultas
 
 ### Definição da Tabela Hash, Estrutura 1
 class HashTable: 
